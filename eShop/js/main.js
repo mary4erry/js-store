@@ -1,46 +1,114 @@
-// Сделайте генерацию корзины динамической, т.е. вёрстка корзины не должна находиться в HTML структуре. Там должен быть только div, в который будет вставляться корзина, сгенерированная на базе JS
-// a. Пустая корзина должна выводить строку “Корзина пуста”
-// b. Наполненная корзина должна выводить “В корзине: n товаров на сумму m рублей”
-// 3. * Сделайте так, чтобы товары в каталоге выводились при помощи JS, т.е.
-// a. В начале создайте массив товаров (сущность “Product”)
-// b. При загрузке страницы на базе данного массива генерируйте вывод из массива.
-// HTML-код должен содержать только div id=”catalog” без вложенного кода. Весь вид каталога генерируется JS
 
 const image = 'https://placehold.it/200x150';
 const cartImage = 'https://placehold.it/100x80';
 
-// const ITEMS = ['Notebook', 'Display', 'Keyboard', 'Mouse', 'Phones', 'Router', 'USB-camera', 'Gamepad'];
-// const PRICES = [1000, 200, 20, 10, 25, 30, 18, 24];
-// const IDS = [1, 2, 3, 4, 5, 6, 7, 8];
+const ITEMS = ['Notebook', 'Display', 'Keyboard', 'Mouse', 'Phones', 'Router', 'USB-camera', 'Gamepad'];
+const PRICES = [1000, 200, 20, 10, 25, 30, 18, 24];
+const IDS = [1, 2, 3, 4, 5, 6, 7, 8];
 
-let goods = [
-    { id: 1, title: 'Notebook', price: 9500 },
-    { id: 2, title: 'Gamepad', price: 500 },
-    { id: 3, title: 'Display', price: 1500 },
-    { id: 4, title: 'Keyboard', price: 500 },
-  ];
+
+//клик по кнопке добавить в корзину
+document.querySelector ('.products').addEventListener ('click', function (event) {
+    if(event.target.classList.contains ('buy-btn')) {
+        addProduct (event.target);
+    }
+})
+// клик по кнопке удалить из корзины/ уменьшить количество
+document.querySelector ('.cart-block').addEventListener ('click', function (event) {
+    if(event.target.classList.contains ('del-btn')) {
+        delProduct (event.target);
+    }
+})
+// клик по кнопке свернуть/развернуть список корзины 
+let cartBtn = document.querySelector ('.btn-cart');
+cartBtn.addEventListener('click', showCart);
+
+function showCart() {
+    document.querySelector('.cart-block').classList.toggle('invisible'); 
+}
+
+// let goods = [
+//     { id: 1, title: 'Notebook', price: 9500 },
+//     { id: 2, title: 'Gamepad', price: 500 },
+//     { id: 3, title: 'Display', price: 1500 },
+//     { id: 4, title: 'Keyboard', price: 500 },
+//   ];
 
 let userCart = [];
+let productsDTO = createDTO ()
+renderCatalog()
+
+//fetch
+function createDTO () {
+    let arr = [];
+    for (let i = 0; i < ITEMS.length ; i++ ) {
+        arr.push (createProduct (ITEMS[i], PRICES[i], IDS[i]))
+    }
+    return arr
+}
+
+function createProduct (name, price, id) {
+    return {
+        name: name,
+        id: id,
+        price: price,
+        img: image,
+        quantity: 0,
+        createTemplate: function () {
+            return `<div class="product-item">
+                        <img src="${this.img}" alt="img">
+                        <div class="desc">
+                            <h3>${this.name}</h3>
+                            <p>${this.price} $</p>
+                            <button class="buy-btn" 
+                            data-name="${this.name}" 
+                            data-price="${this.price}"
+                            data-image="${this.img}"
+                            data-id="${this.id}"
+                            >Купить</button>
+                        </div>
+                    </div>`
+        },
+        add: function() {
+            this.quantity++
+        }  
+    }
+}
 
 function renderCatalog () {
     let htmlStr = '';
-    goods.forEach (el => 
-        htmlStr += `
-            <div class="product-item">
-                <img src="${image}" alt="">
-                <div class="desc">
-                    <h3>${el.title}</h3>
-                    <p>${el.price} $</p>
-                    <button class="buy-btn" 
-                    data-name="${el.title}" 
-                    data-price="${el.price}"
-                    >Купить</button>
-                </div>
-            </div>
-         `);
+
+    productsDTO.forEach (el => 
+        htmlStr += el.createTemplate ());
     document.querySelector('.products').innerHTML =  htmlStr;
 }
-renderCatalog()
+
+function renderCart () {
+    if ( userCart.length == 0) {
+        document.querySelector('.cart-block').innerHTML = "Корзина пуста"
+    } else {
+        let htmlStr = '';
+        userCart.forEach (el => 
+        htmlStr += `
+                <div class="cart-item">
+                    <div class="product-bio">
+                        <img src="${cartImage}" alt="Some image"> 
+                        <div class="product-desc">
+                            <p class="product-title">${el.name}</p> 
+                            <p class="product-quantity">${el.quantity}</p> 
+                            <p class="product-single-price">$ ${el.price}</p>
+                        </div>
+                    </div> 
+                    <div class="right-block">
+                        <p class="product-price">${el.price * el.quantity}</p> 
+                        <button class="del-btn" data-name="${el.name}">×</button>
+                    </div>
+                </div>
+            `);
+    document.querySelector('.cart-block').innerHTML =  htmlStr;
+    }  
+}
+renderCart()
 
 function addProduct (prod) {
  
@@ -69,68 +137,66 @@ function delProduct (prod) {
            userCart.splice (userCart.indexOf(findCard), 1)
        }
        renderCart()
-   }
-
-function renderCart () {
-    if ( userCart.length == 0) {
-        document.querySelector('.cart-block').innerHTML = "Корзина пуста"
-    } else {
-        let htmlStr = '';
-        userCart.forEach (el => 
-        htmlStr += `
-                <div class="cart-item">
-                    <div class="product-bio">
-                        <img src="${cartImage}" alt="Some image"> 
-                        <div class="product-desc">
-                            <p class="product-title">${el.title}</p> 
-                            <p class="product-quantity">${el.quantity}</p> 
-                            <p class="product-single-price">$ ${el.price}</p>
-                        </div>
-                    </div> 
-                    <div class="right-block">
-                        <p class="product-price">${el.price * el.quantity}</p> 
-                        <button class="del-btn" data-name="${el.name}">×</button>
-                    </div>
-                </div>
-            `);
-    document.querySelector('.cart-block').innerHTML =  htmlStr;
-    }  
-}
-renderCart()
-
-let cartBtn = document.querySelector ('.btn-cart');
-cartBtn.addEventListener('click', showCart);
-
-function showCart() {
-    document.querySelector('.cart-block').classList.toggle('invisible'); 
 }
 
-document.querySelector ('.products').addEventListener ('click', function (event) {
-    if(event.target.classList.contains ('buy-btn')) {
-        addProduct (event.target);
-    }
-})
+// function sum () {
+//     let sum = 0;
+//     userCart.forEach ( el => {
+//         sum += el.price
 
-document.querySelector ('.cart-block').addEventListener ('click', function (event) {
-    if(event.target.classList.contains ('del-btn')) {
-        delProduct (event.target);
-    }
-})
-
-function sum () {
+//     })
+//     console.log(sum);
     
-}
+//     return sum
+// }
 
 
 //ООП
 
-let store = {
-    catalog: [],
-    cart: [],
+// let store = {
+//     catalog: [],
+//     cart: [],
+//     _init: function (){
+//         this.createDTO ()
+//         this.renderCatalog ()
+//     },
+//     createDTO: function () {
+//         for (let i = 0; i < ITEMS.length; i++) {
+//             this.catalog.push (this._createProduct (ITEMS[i], PRICES[i], IDS[i]));
+//         }
+//     },
+//     _createProduct: function (name, price, id) {
+//         return {
+//             name: name,
+//             id: id,
+//             price: price,
+//             img: image,
+//             createTemplate: function () {
+//                     return `
+//                         <div class="product-item">
+//                             <img src="${this.img}" alt="">
+//                             <div class="desc">
+//                                 <h3>${this.name}</h3>
+//                                 <p>${this.price} $</p>
+//                                 <button class="buy-btn" 
+//                                 data-name="${this.name}" 
+//                                 data-price="${this.price}"
+//                                 data-id="${this.id}"
+//                                 >Купить</button>
+//                             </div>
+//                         </div>
+//                     `
+//             }
+//         }
+//     },
+//     renderCatalog: function () {
+//         let htmlStr = ''
 
-    createDTO: function () {
-        for (let i = 0; i < goods.length; i++) {
-            this.catalog.push (goods[i])
-        }
-    }
-}
+//         this.catalog.forEach (el => {
+//             htmlStr += el.createTemplate ()
+//         })
+//         document.querySelector('.products').innerHTML =  htmlStr;
+//     }
+// }
+
+// store._init() //создание товаров + рендер из объекта
