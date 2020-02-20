@@ -1,11 +1,66 @@
 
 const image = 'https://placehold.it/200x150';
 const cartImage = 'https://placehold.it/100x80';
-
 const ITEMS = ['Notebook', 'Display', 'Keyboard', 'Mouse', 'Phones', 'Router', 'USB-camera', 'Gamepad'];
 const PRICES = [1000, 200, 20, 10, 25, 30, 18, 24];
 const IDS = [1, 2, 3, 4, 5, 6, 7, 8];
 
+let userCart = [];
+let list = createDTO ()
+
+class Catalog {
+    constructor () {
+        this
+    }
+    render () {
+
+    }
+}
+
+class Product {
+    сonstructor (prod) {
+        this.id = prod.id
+        this.title = prod.title
+        this.price = prod.price
+        this.img = prod.img
+    }
+    render () {
+            return `<div class="product-item">
+                        <img src="${this.img}" alt="img">
+                        <div class="desc">
+                            <h3>${this.title}</h3>
+                            <p>${this.price} $</p>
+                            <button class="buy-btn" 
+                            data-name="${this.title}" 
+                            data-price="${this.price}"
+                            data-image="${this.img}"
+                            data-id="${this.id}"
+                            >Купить</button>
+                        </div>
+                    </div>`
+    }
+    addProduct () {
+
+    }
+}
+
+class Cart {
+    render () {
+
+    }
+    showCart () {
+
+    }
+}
+
+class CartItem {
+    constructor () {
+
+    }
+    delProduct () {
+
+    }
+}
 
 //клик по кнопке добавить в корзину
 document.querySelector ('.products').addEventListener ('click', function (event) {
@@ -34,51 +89,31 @@ function showCart() {
 //     { id: 4, title: 'Keyboard', price: 500 },
 //   ];
 
-let userCart = [];
-let productsDTO = createDTO ()
+
 renderCatalog()
 
 //fetch
 function createDTO () {
     let arr = [];
     for (let i = 0; i < ITEMS.length ; i++ ) {
-        arr.push (createProduct (ITEMS[i], PRICES[i], IDS[i]))
+        arr.push (createProduct (i))
     }
     return arr
 }
 
-function createProduct (name, price, id) {
+function createProduct (i) {
     return {
-        name: name,
-        id: id,
-        price: price,
+        id: IDS[i],
+        title: ITEMS[i],
+        price: PRICES[i],
         img: image,
-        quantity: 0,
-        createTemplate: function () {
-            return `<div class="product-item">
-                        <img src="${this.img}" alt="img">
-                        <div class="desc">
-                            <h3>${this.name}</h3>
-                            <p>${this.price} $</p>
-                            <button class="buy-btn" 
-                            data-name="${this.name}" 
-                            data-price="${this.price}"
-                            data-image="${this.img}"
-                            data-id="${this.id}"
-                            >Купить</button>
-                        </div>
-                    </div>`
-        },
-        add: function() {
-            this.quantity++
-        }  
     }
 }
 
 function renderCatalog () {
     let htmlStr = '';
 
-    productsDTO.forEach (el => 
+    list.forEach (el => 
         htmlStr += el.createTemplate ());
     document.querySelector('.products').innerHTML =  htmlStr;
 }
