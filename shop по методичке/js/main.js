@@ -9,7 +9,7 @@ class GoodsItem {
         this.price = price,
         this.img = image;
     }
-    render () {
+    render() {
         return `<div class="goods-item">
                     <img src="${this.img}" alt="img">
                     <div class="desc">
@@ -24,68 +24,79 @@ class GoodsItem {
                 </div>`
     }
 }
+
 class GoodsList {
     constructor() {
-      this.goods = [];
-      this.fetchGoods ()
-        .then(() => this.render)
+        this.goods = [];
+        this.fetchGoods()
+            .then(() => this.render())
+        this.filteredGoods = []
     }
-     // fetchGoods (cb) {
-    //   makeGETRequest(`${API_URL}/catalogData.json`, (goods) => {
-    //       this.goods = JSON.parse(goods);
-    //       cb ();
-    //   })
-    // }
-    fetchGoods () {
-        return fetch (url)
-            .then (dataJSON => dataJSON.json())
-            .then (data => {console.log(data)})
-            .catch (err => {
-                console.log (err)
+    filterGoods(value) {
+        // console.log('filterGoods', value)
+        const regexp = new RegExp(value, 'i')
+            this.filteredGoods = this.goods.filter(good => 
+                regexp.test(good.product_name))              
+            this.render()
+    }
+    fetchGoods() {
+        return fetch(url)
+            .then(dataJSON => dataJSON.json())
+            // .then (data => {console.log(data)})
+            .then(data => {
+                data.forEach( el => {
+                    this.goods.push(el)  
+                    this.filteredGoods.push(el) 
+                })
             })
+            .catch(err => {
+                console.log(err)  
+            })      
     }      
-    filterGoods (value) {
-
-    }
-    render () {
+    render() {
         let listHtml = '';
-        this.goods.forEach( good => {
+        this.filteredGoods.forEach( good => {
             const goodItem = new GoodsItem (good.product_name, good.price);
-            listHtml += goodItem.render ();
+            listHtml += goodItem.render();
         })
         document.querySelector('.goods-list').innerHTML = listHtml
     }
 }
 
-searchButton.addEventListener ('click', (e) => {
-    const value = searchInput.value
-    list.fetchGoods
+const list = new GoodsList();
+
+let searchButton = document.querySelector('.btn-search');
+let searchInput = document.querySelector('.search-field');
+
+searchButton.addEventListener('click', (e) => {
+    const value = searchInput.value;
+    // console.log(value); 
+    list.filterGoods(value)  
 })
 
 class Cart {
-    addProduct () {
+    constructor() {
+        this.cartList = [];
+    addProduct() {
 
     }
     delProduct() {
 
     }
-    getListProd() {
+    render() {
 
     }
 }
 
 class CartItem {
-    render () {
+    render() {
 
     }
 }
 
-const list = new GoodsList ();
-// list.fetchGoods( () => {
-//     list.render();
-// });
 
-function makeGETRequest (url){
+
+function makeGETRequest(url){
     return new Promise((resolve, reject) => {
         let xhr = new XMLHttpRequest();
         
@@ -100,7 +111,6 @@ function makeGETRequest (url){
         }
         console.log(xhr);
         xhr.open('GET', url, true);
-
         xhr.send();
     }
     )
@@ -134,8 +144,6 @@ function makeGETRequest (url){
 //     document.querySelector('.goods-list').innerHTML = goodsList;
 //   }
 //   renderGoodsList(goods);
-
-
 // const ITEMS = ['Notebook', 'Display', 'Keyboard', 'Mouse', 'Phones', 'Router', 'USB-camera', 'Gamepad'];
 // const PRICES = [1000, 200, 20, 10, 25, 30, 18, 24];
 // const IDS = [1, 2, 3, 4, 5, 6, 7, 8];
@@ -175,28 +183,20 @@ function makeGETRequest (url){
 //                     </div>`
 //     }
 //     addProduct () {
-
 //     }
 // }
-
 // class Cart {
 //     render () {
-
 //     }
 //     showCart () {
-
 //     }
 // }
-
 // class CartItem {
 //     constructor () {
-
 //     }
 //     delProduct () {
-
 //     }
 // }
-
 // //клик по кнопке добавить в корзину
 // document.querySelector ('.products').addEventListener ('click', function (event) {
 //     if(event.target.classList.contains ('buy-btn')) {
@@ -223,10 +223,7 @@ function makeGETRequest (url){
 // //     { id: 3, title: 'Display', price: 1500 },
 // //     { id: 4, title: 'Keyboard', price: 500 },
 // //   ];
-
-
 // renderCatalog()
-
 // //fetch
 // function createDTO () {
 //     let arr = [];
@@ -235,7 +232,6 @@ function makeGETRequest (url){
 //     }
 //     return arr
 // }
-
 // function createProduct (i) {
 //     return {
 //         id: IDS[i],
@@ -244,7 +240,6 @@ function makeGETRequest (url){
 //         img: image,
 //     }
 // }
-
 // function renderCatalog () {
 //     let htmlStr = '';
 
@@ -252,7 +247,6 @@ function makeGETRequest (url){
 //         htmlStr += el.createTemplate ());
 //     document.querySelector('.products').innerHTML =  htmlStr;
 // }
-
 // function renderCart () {
 //     if ( userCart.length == 0) {
 //         document.querySelector('.cart-block').innerHTML = "Корзина пуста"
@@ -281,7 +275,7 @@ function makeGETRequest (url){
 // renderCart()
 
 // function addProduct (prod) {
- 
+
 //     let findCard = userCart.find ( el => {
 //         return el.name === prod.dataset ['name']
 //     })    
@@ -296,7 +290,6 @@ function makeGETRequest (url){
 //     }
 //     renderCart()
 // }
-
 // function delProduct (prod) {
 //        let findCard = userCart.find ( el => {
 //            return el.name === prod.dataset ['name']
